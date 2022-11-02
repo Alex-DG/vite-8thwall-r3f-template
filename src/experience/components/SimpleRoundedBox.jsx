@@ -4,11 +4,11 @@ export default function SimpleRoundedBox({
   color = 'hotpink',
   smoothness = 4,
   radius = 0.08,
-  size = [1, 1, 1],
+  args = [1, 1, 1],
   ...props
 }) {
   return (
-    <RoundedBox args={size} {...{ radius, smoothness }} {...props}>
+    <RoundedBox {...{ args, radius, smoothness }} {...props}>
       <meshPhongMaterial color={color} />
     </RoundedBox>
   )

@@ -10,6 +10,8 @@ Minimal starter project using:
 - Drei
 - Sass
 
+https://user-images.githubusercontent.com/4311684/206087157-ab8fe520-f0c4-4d09-9a61-1819e08697a5.mp4
+
 ## Setup
 
 (1) In `index.html` use your 8thWall project Id.

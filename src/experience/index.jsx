@@ -1,4 +1,5 @@
 import { Canvas } from '@react-three/fiber'
+import { Perf } from 'r3f-perf'
 
 import EightWallBridge from './EigthWallBridge'
 
@@ -8,6 +9,7 @@ function App() {
   return (
     <Canvas>
       <EightWallBridge>
+        <Perf position="top-left" antialias={false} minimal />
         <Scene />
       </EightWallBridge>
     </Canvas>

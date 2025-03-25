@@ -1,5 +1,5 @@
 import { useThree, useFrame, createPortal } from '@react-three/fiber'
-import { useEffect, memo, useCallback, useRef, useState } from 'react'
+import { useEffect, memo, useCallback, useState } from 'react'
 import * as THREE from 'three'
 
 // Separate component for AR content
@@ -20,7 +20,6 @@ const ARContent = memo(({ children }) => {
 const EightWallBridge = memo(({ children }) => {
   const gl = useThree((state) => state.gl)
   const [xr8Ready, setXr8Ready] = useState(false)
-  const canvasRef = useRef(null)
 
   const setupScene = useCallback(({ camera, renderer }) => {
     // Enhanced shadow configuration

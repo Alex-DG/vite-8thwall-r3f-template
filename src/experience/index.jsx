@@ -7,7 +7,7 @@ import Scene from './Scene'
 
 function App() {
   return (
-    <Canvas>
+    <Canvas shadows>
       <EightWallBridge>
         <Perf position="top-left" antialias={false} minimal />
         <Scene />

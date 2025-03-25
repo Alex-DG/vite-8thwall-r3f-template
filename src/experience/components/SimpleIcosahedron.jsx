@@ -1,36 +1,36 @@
-import { Box } from '@react-three/drei'
+import { Icosahedron } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import * as THREE from 'three'
 
 // Color palette
 const colors = [
-  new THREE.Color('#ff0055'), // neon pink
   new THREE.Color('#FF69B4'), // hot pink
   new THREE.Color('#00fff5'), // cyan
-  new THREE.Color('#7700ff'), // purple
-  new THREE.Color('#ffff00'), // yellow
 ]
 
-const SimpleBox = ({ args = [1, 1, 1], ...props }) => {
-  const boxRef = useRef()
+const SimpleIcosahedron = ({ args = [1, 1], ...props }) => {
+  const icoRef = useRef()
   const materialRef = useRef()
-  const colorIndex = useRef(0)
+  const colorIndex = useRef(2) // Start from cyan to alternate with box
   const lerpFactor = useRef(0)
 
   useFrame(({ clock }) => {
-    // Box movement animation - using absolute sine for ground boundary
+    // Icosahedron movement animation
     const amplitude = 1
     const baseHeight = 1
-    const frequency = 0.4
-    const timeOffset = Math.PI / frequency // This creates a perfect half-cycle offset
-    const time = clock.getElapsedTime() + timeOffset // Add offset to time
+    const frequency = 0.5
+    const time = clock.getElapsedTime() // No offset needed, this is our reference motion
 
-    boxRef.current.position.y =
+    icoRef.current.position.y =
       baseHeight + Math.abs(Math.sin(time * frequency)) * amplitude
-    boxRef.current.rotation.y += 0.01
 
-    // Color transition animation - start from middle of palette
+    // Add some gentle wobble - opposite direction to box
+    icoRef.current.rotation.x += 0.005
+    icoRef.current.rotation.y -= 0.01 // Opposite direction
+    icoRef.current.rotation.z += 0.002
+
+    // Color transition animation - started from different color
     lerpFactor.current += 0.005
     if (lerpFactor.current >= 1) {
       lerpFactor.current = 0
@@ -49,17 +49,17 @@ const SimpleBox = ({ args = [1, 1, 1], ...props }) => {
   })
 
   return (
-    <Box ref={boxRef} args={args} castShadow {...props}>
+    <Icosahedron ref={icoRef} args={args} castShadow {...props}>
       <meshStandardMaterial
         ref={materialRef}
         roughness={0.1}
         metalness={0.3}
-        emissive={colors[0]}
+        emissive={colors[2]} // Start from cyan to match colorIndex
         emissiveIntensity={1}
         toneMapped={false}
       />
-    </Box>
+    </Icosahedron>
   )
 }
 
-export default SimpleBox
+export default SimpleIcosahedron

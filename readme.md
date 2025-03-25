@@ -8,7 +8,7 @@ Minimal starter project using:
 - 8th wall
 - React-Three-Fiber
 - Drei
-- Sass
+- CSS
 
 https://user-images.githubusercontent.com/4311684/206087157-ab8fe520-f0c4-4d09-9a61-1819e08697a5.mp4
 

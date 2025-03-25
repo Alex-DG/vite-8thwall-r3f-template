@@ -48,6 +48,7 @@ const SimpleBox = ({ args = [1, 1, 1], ...props }) => {
         emissive={color.current}
         emissiveIntensity={0.8}
         toneMapped={false}
+        wireframe={props.wireframe}
       />
     </Box>
   )

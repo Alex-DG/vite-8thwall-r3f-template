@@ -20,8 +20,8 @@ const WobbleDonut = ({ args = [1, 0.4, 16, 32], ...props }) => {
         factor={0.6}
         speed={1}
         color="hotpink"
-        roughness={0.3}
-        metalness={0.1}
+        roughness={1}
+        metalness={0.0}
       />
     </mesh>
   )

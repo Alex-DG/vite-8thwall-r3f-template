@@ -43,7 +43,7 @@ const SimpleIcosahedron = ({ args = [1, 1], ...props }) => {
       <meshStandardMaterial
         color={color.current}
         roughness={0.1}
-        metalness={0.3}
+        metalness={0.6}
         emissive={color.current}
         emissiveIntensity={0.8}
         toneMapped={false}

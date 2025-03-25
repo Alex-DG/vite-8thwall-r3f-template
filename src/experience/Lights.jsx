@@ -2,13 +2,18 @@ export default function Lights() {
   return (
     <>
       <directionalLight
-        position={[5, 5, 5]}
+        position={[5, 6, 5]}
         intensity={2}
         castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-far={20}
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-far={50}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
+        shadow-bias={-0.0001}
       />
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.7} />
     </>
   )
 }

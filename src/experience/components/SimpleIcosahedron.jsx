@@ -16,7 +16,7 @@ const SimpleIcosahedron = ({ args = [1, 1], ...props }) => {
   const icoRef = useRef()
   const clock = useRef(new THREE.Clock())
   const color = useRef(new THREE.Color())
-  const baseHeight = 1
+  const baseHeight = 1.5
   const amplitude = 1
 
   // Set initial color

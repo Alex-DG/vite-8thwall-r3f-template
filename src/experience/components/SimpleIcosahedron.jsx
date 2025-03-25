@@ -5,8 +5,11 @@ import * as THREE from 'three'
 
 // Color palette
 const colors = [
+  new THREE.Color('#ff0055'), // neon pink
   new THREE.Color('#FF69B4'), // hot pink
   new THREE.Color('#00fff5'), // cyan
+  new THREE.Color('#7700ff'), // purple
+  new THREE.Color('#ffff00'), // yellow
 ]
 
 const SimpleIcosahedron = ({ args = [1, 1], ...props }) => {

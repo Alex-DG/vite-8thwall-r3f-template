@@ -1,11 +1,26 @@
 import { useThree, useFrame, createPortal } from '@react-three/fiber'
-import { useEffect, memo, useCallback } from 'react'
+import { useEffect, memo, useCallback, useRef, useState } from 'react'
 import * as THREE from 'three'
 
-export default memo(function EightwallBridge({ children }) {
-  const gl = useThree((state) => state.gl)
+// Separate component for AR content
+const ARContent = memo(({ children }) => {
+  const { scene, camera } = window.XR8.Threejs.xrScene()
   const set = useThree((state) => state.set)
-  const camera = useThree((state) => state.camera)
+
+  useEffect(() => {
+    if (camera) {
+      set({ camera })
+    }
+  }, [camera, set])
+
+  return createPortal(children, scene)
+})
+
+// Main bridge component
+const EightWallBridge = memo(({ children }) => {
+  const gl = useThree((state) => state.gl)
+  const [xr8Ready, setXr8Ready] = useState(false)
+  const canvasRef = useRef(null)
 
   const setupScene = useCallback(({ camera, renderer }) => {
     // Enhanced shadow configuration
@@ -16,14 +31,13 @@ export default memo(function EightwallBridge({ children }) {
     renderer.toneMappingExposure = 1
 
     // Safe performance optimizations
-    renderer.info.autoReset = false // Disable auto stats reset
-    renderer.powerPreference = 'high-performance' // Hint to use discrete GPU if available
+    renderer.info.autoReset = false
+    renderer.powerPreference = 'high-performance'
 
-    // Ensure proper shadow camera setup
+    // Camera setup
     camera.near = 0.1
     camera.far = 100
     camera.updateProjectionMatrix()
-
     camera.position.set(0, 3, 3)
   }, [])
 
@@ -31,78 +45,81 @@ export default memo(function EightwallBridge({ children }) {
     return {
       name: 'threejsinitscene',
       onStart: ({ canvas }) => {
-        const { camera, renderer } = XR8.Threejs.xrScene()
-
+        const { camera, renderer } = window.XR8.Threejs.xrScene()
         setupScene({ camera, renderer })
 
-        // Touch event handlers with cleanup
+        // Touch event handlers
         const handleTouchMove = (event) => event.preventDefault()
         const handleTouchStart = (e) => {
           if (e.touches.length === 1) {
-            XR8.XrController.recenter()
+            window.XR8.XrController.recenter()
           }
         }
 
-        // Add event listeners with passive option where possible
-        canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
-        canvas.addEventListener('touchstart', handleTouchStart, { passive: true })
+        // Add event listeners
+        canvas.addEventListener('touchmove', handleTouchMove, {
+          passive: false,
+        })
+        canvas.addEventListener('touchstart', handleTouchStart, {
+          passive: true,
+        })
 
-        // Sync the xr controller's 6DoF position and camera parameters with our scene.
-        XR8.XrController.updateCameraProjectionMatrix({
+        // Sync camera parameters
+        window.XR8.XrController.updateCameraProjectionMatrix({
           origin: camera.position,
           facing: camera.quaternion,
         })
 
         camera.userData.ready = true
-        set({ camera })
+        setXr8Ready(true)
 
-        // Cleanup function for the pipeline module
         return () => {
           canvas.removeEventListener('touchmove', handleTouchMove)
           canvas.removeEventListener('touchstart', handleTouchStart)
         }
       },
     }
-  }, [setupScene, set])
+  }, [setupScene])
 
   useEffect(() => {
-    const onxrloaded = () => {
+    const initXR = () => {
+      if (!window.XR8) return
+
       const canvas = gl.domElement
       window.THREE = THREE
 
       // Pipeline modules configuration
       const pipelineModules = [
-        XR8.GlTextureRenderer.pipelineModule(),
-        XR8.Threejs.pipelineModule(),
-        XR8.XrController.pipelineModule(),
-        XRExtras.FullWindowCanvas.pipelineModule(),
-        XRExtras.Loading.pipelineModule(),
-        XRExtras.RuntimeError.pipelineModule(),
+        window.XR8.GlTextureRenderer.pipelineModule(),
+        window.XR8.Threejs.pipelineModule(),
+        window.XR8.XrController.pipelineModule(),
+        window.XRExtras.FullWindowCanvas.pipelineModule(),
+        window.XRExtras.Loading.pipelineModule(),
+        window.XRExtras.RuntimeError.pipelineModule(),
         initScenePipelineModule(),
       ]
 
-      XR8.addCameraPipelineModules(pipelineModules)
+      window.XR8.addCameraPipelineModules(pipelineModules)
 
       // Start XR with optimized configuration
-      XR8.run({
+      window.XR8.run({
         canvas,
-        // Only use performance-safe options
         disableWorldTracking: false,
-        allowedDevices: XR8.XrConfig.device().ANY,
+        allowedDevices: window.XR8.XrConfig.device().ANY,
       })
     }
 
+    // Wait for XR8 to be available
     if (window.XR8) {
-      onxrloaded()
+      initXR()
     } else {
-      window.addEventListener('xrloaded', onxrloaded)
+      window.addEventListener('xrloaded', initXR)
     }
 
-    // Cleanup
     return () => {
-      window.removeEventListener('xrloaded', onxrloaded)
+      window.removeEventListener('xrloaded', initXR)
       if (window.XR8) {
-        XR8.stop()
+        window.XR8.stop()
       }
     }
   }, [gl.domElement, initScenePipelineModule])
@@ -110,7 +127,9 @@ export default memo(function EightwallBridge({ children }) {
   // Disable R3F rendering loop since 8th Wall handles it
   useFrame(() => null, 1)
 
-  if (!camera?.userData.ready) return null
+  if (!xr8Ready) return null
 
-  return createPortal(children, XR8.Threejs.xrScene().scene)
+  return <ARContent>{children}</ARContent>
 })
+
+export default EightWallBridge

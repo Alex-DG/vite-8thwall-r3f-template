@@ -11,51 +11,38 @@ const colors = [
 
 const SimpleIcosahedron = ({ args = [1, 1], ...props }) => {
   const icoRef = useRef()
-  const materialRef = useRef()
-  const colorIndex = useRef(2) // Start from cyan to alternate with box
-  const lerpFactor = useRef(0)
+  const clock = useRef(new THREE.Clock())
+  const color = useRef(new THREE.Color())
+  const baseHeight = 1
+  const amplitude = 1
 
-  useFrame(({ clock }) => {
-    // Icosahedron movement animation
-    const amplitude = 1
-    const baseHeight = 1
-    const frequency = 0.5
-    const time = clock.getElapsedTime() // No offset needed, this is our reference motion
+  // Set initial color
+  color.current.setHSL(0.5, 1, 0.5)
 
+  useFrame(() => {
+    const time = clock.current.getElapsedTime()
+    const frequency = 0.8
     icoRef.current.position.y =
       baseHeight + Math.abs(Math.sin(time * frequency)) * amplitude
 
-    // Add some gentle wobble - opposite direction to box
-    icoRef.current.rotation.x += 0.005
-    icoRef.current.rotation.y -= 0.01 // Opposite direction
-    icoRef.current.rotation.z += 0.002
+    icoRef.current.rotation.z += 0.01
+    icoRef.current.rotation.x += 0.01
 
-    // Color transition animation - started from different color
-    lerpFactor.current += 0.005
-    if (lerpFactor.current >= 1) {
-      lerpFactor.current = 0
-      colorIndex.current = (colorIndex.current + 1) % colors.length
-    }
-
-    const currentColor = colors[colorIndex.current]
-    const nextColor = colors[(colorIndex.current + 1) % colors.length]
-
-    materialRef.current.color
-      .copy(currentColor)
-      .lerp(nextColor, lerpFactor.current)
-    materialRef.current.emissive
-      .copy(materialRef.current.color)
-      .multiplyScalar(0.8)
+    // Update color
+    color.current.setHSL(time * 0.1 + 0.5, 1, 0.5)
+    icoRef.current.material.color = color.current
+    icoRef.current.material.emissive = color.current
+    icoRef.current.material.emissiveIntensity = 0.6
   })
 
   return (
     <Icosahedron ref={icoRef} args={args} castShadow {...props}>
       <meshStandardMaterial
-        ref={materialRef}
+        color={color.current}
         roughness={0.1}
         metalness={0.3}
-        emissive={colors[2]} // Start from cyan to match colorIndex
-        emissiveIntensity={1}
+        emissive={color.current}
+        emissiveIntensity={0.8}
         toneMapped={false}
       />
     </Icosahedron>

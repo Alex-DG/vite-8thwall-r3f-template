@@ -14,48 +14,39 @@ const colors = [
 
 const SimpleBox = ({ args = [1, 1, 1], ...props }) => {
   const boxRef = useRef()
-  const materialRef = useRef()
-  const colorIndex = useRef(0)
-  const lerpFactor = useRef(0)
+  const clock = useRef(new THREE.Clock())
+  const color = useRef(new THREE.Color())
+  const baseHeight = 1
+  const amplitude = 0.5
 
-  useFrame(({ clock }) => {
-    // Box movement animation - using absolute sine for ground boundary
-    const amplitude = 1
-    const baseHeight = 1
-    const frequency = 0.4
-    const timeOffset = Math.PI / frequency // This creates a perfect half-cycle offset
-    const time = clock.getElapsedTime() + timeOffset // Add offset to time
+  // Set initial color
+  color.current.setHSL(0, 1, 0.5)
 
+  useFrame(() => {
+    const currentTime = clock.current.getElapsedTime()
+    const frequency = 0.6
+    const timeOffset = Math.PI / frequency
+    const adjustedTime = currentTime + timeOffset
     boxRef.current.position.y =
-      baseHeight + Math.abs(Math.sin(time * frequency)) * amplitude
+      baseHeight + Math.abs(Math.sin(adjustedTime * frequency)) * amplitude
+
     boxRef.current.rotation.y += 0.01
 
-    // Color transition animation - start from middle of palette
-    lerpFactor.current += 0.005
-    if (lerpFactor.current >= 1) {
-      lerpFactor.current = 0
-      colorIndex.current = (colorIndex.current + 1) % colors.length
-    }
-
-    const currentColor = colors[colorIndex.current]
-    const nextColor = colors[(colorIndex.current + 1) % colors.length]
-
-    materialRef.current.color
-      .copy(currentColor)
-      .lerp(nextColor, lerpFactor.current)
-    materialRef.current.emissive
-      .copy(materialRef.current.color)
-      .multiplyScalar(0.8)
+    // Update color
+    color.current.setHSL(currentTime * 0.1, 1, 0.5)
+    boxRef.current.material.color = color.current
+    boxRef.current.material.emissive = color.current
+    boxRef.current.material.emissiveIntensity = 0.6
   })
 
   return (
     <Box ref={boxRef} args={args} castShadow {...props}>
       <meshStandardMaterial
-        ref={materialRef}
+        color={color.current}
         roughness={0.1}
         metalness={0.3}
-        emissive={colors[0]}
-        emissiveIntensity={1}
+        emissive={color.current}
+        emissiveIntensity={0.8}
         toneMapped={false}
       />
     </Box>

@@ -10,7 +10,8 @@ Minimal starter project using:
 - Drei
 - CSS
 
-[DEMO](https://www.youtube.com/shorts/-po9PcpTnoA)
+👾 [DEMO](https://www.youtube.com/shorts/-po9PcpTnoA)
+
 [![Watch the video](https://img.youtube.com/vi/-po9PcpTnoA/hqdefault.jpg)](https://www.youtube.com/shorts/-po9PcpTnoA)
 
 ## Setup

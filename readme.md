@@ -10,7 +10,8 @@ Minimal starter project using:
 - Drei
 - CSS
 
-https://user-images.githubusercontent.com/4311684/206087157-ab8fe520-f0c4-4d09-9a61-1819e08697a5.mp4
+<img width="826" alt="Screenshot 2025-04-11 at 9 23 09" src="https://github.com/user-attachments/assets/60327ab6-c0f4-4543-b198-7157aad33cd2" />
+
 
 ## Setup
 

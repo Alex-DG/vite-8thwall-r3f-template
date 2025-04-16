@@ -1,4 +1,5 @@
 import { Canvas } from '@react-three/fiber'
+import { Suspense } from 'react'
 import { Perf } from 'r3f-perf'
 
 import EightWallBridge from './EigthWallBridge'
@@ -10,7 +11,10 @@ function App() {
     <Canvas shadows>
       <EightWallBridge>
         <Perf position="top-left" antialias={false} minimal />
-        <Scene />
+
+        <Suspense fallback={'loading...'}>
+          <Scene />
+        </Suspense>
       </EightWallBridge>
     </Canvas>
   )

@@ -4,10 +4,14 @@ import WobbleDonut from './components/WobbleDonut'
 import SimpleIcosahedron from './components/SimpleIcosahedron'
 import Character from './components/Character'
 import Rock from './components/Rock'
+import { Environment } from '@react-three/drei'
 
 export default function Scene() {
   return (
     <>
+      {/* <color attach="background" args={['red']} /> */}
+      <Environment preset="city" background={false} />
+
       <Lights />
       <Character
         position={[1, 0, 0.5]}

@@ -1,5 +1,6 @@
+import { Environment } from '@react-three/drei'
 import { useThree, useFrame, createPortal } from '@react-three/fiber'
-import { useEffect, memo, useCallback, useState } from 'react'
+import { useEffect, memo, useCallback, useState, useRef } from 'react'
 import * as THREE from 'three'
 
 // Separate component for AR content
@@ -13,6 +14,16 @@ const ARContent = memo(({ children }) => {
     }
   }, [camera, set])
 
+  useFrame(() => {
+    if (scene) {
+      // Ensure the background color is updated every frame
+      const { renderer } = window.XR8.Threejs.xrScene()
+      if (renderer) {
+        renderer.setClearColor(scene.background)
+      }
+    }
+  })
+
   return createPortal(children, scene)
 })
 
@@ -20,6 +31,7 @@ const ARContent = memo(({ children }) => {
 const EightWallBridge = memo(({ children }) => {
   const gl = useThree((state) => state.gl)
   const [xr8Ready, setXr8Ready] = useState(false)
+  const initialized = useRef(false)
 
   const setupScene = useCallback(({ camera, renderer }) => {
     // Enhanced shadow configuration
@@ -37,7 +49,7 @@ const EightWallBridge = memo(({ children }) => {
     camera.near = 0.1
     camera.far = 100
     camera.updateProjectionMatrix()
-    camera.position.set(0, 3, 3)
+    camera.position.set(0, 3, 4)
   }, [])
 
   const initScenePipelineModule = useCallback(() => {
@@ -82,10 +94,14 @@ const EightWallBridge = memo(({ children }) => {
 
   useEffect(() => {
     const initXR = () => {
-      if (!window.XR8) return
+      if (!window.XR8 || initialized.current) return
+      initialized.current = true
 
       const canvas = gl.domElement
       window.THREE = THREE
+
+      // Clear any existing pipeline modules
+      window.XR8.clearCameraPipelineModules()
 
       // Pipeline modules configuration
       const pipelineModules = [
@@ -119,6 +135,7 @@ const EightWallBridge = memo(({ children }) => {
       window.removeEventListener('xrloaded', initXR)
       if (window.XR8) {
         window.XR8.stop()
+        initialized.current = false
       }
     }
   }, [gl.domElement, initScenePipelineModule])
